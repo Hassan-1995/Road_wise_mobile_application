@@ -3,7 +3,46 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { IconSymbol } from "./IconSymbol";
 
-const TripCard = () => {
+type DropoutAssignment = {
+  assignedAt: string;
+  address: string;
+  driverId: number;
+  id: number;
+  latitude: string;
+  longitude: string;
+  status: "Pending" | "Completed" | "Cancelled";
+  storeId: number;
+  storename: string;
+  tripId: number;
+};
+
+type TripCardProps = {
+  tripData: DropoutAssignment[];
+};
+
+const TripCard = ({ tripData }: TripCardProps) => {
+  const getStatusStyles = (status: "Pending" | "Completed" | "Cancelled") => {
+    switch (status) {
+      case "Pending":
+        return {
+          backgroundColor: COLORS.blue,
+          iconName: "clock.circle",
+        };
+      case "Completed":
+        return {
+          backgroundColor: COLORS.green,
+          iconName: "checkmark.circle.fill",
+        };
+      case "Cancelled":
+        return { backgroundColor: COLORS.red, iconName: "xmark.circle.fill" };
+      default:
+        return {
+          backgroundColor: COLORS.grey,
+          iconName: "questionmark.circle.fill",
+        };
+    }
+  };
+  const statusStyles = getStatusStyles(tripData[0].status);
   return (
     <View style={styles.card}>
       {/* TRIP HEADER */}
@@ -16,16 +55,21 @@ const TripCard = () => {
               color={COLORS.white}
             />
           </View>
-          <Text style={styles.tripId}>TRP-001</Text>
+          <Text style={styles.tripId}>TRP-{tripData[0].tripId}</Text>
         </View>
         <View>
-          <View style={styles.statusBadge}>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: statusStyles.backgroundColor },
+            ]}
+          >
             <IconSymbol
               size={15}
-              name={"exclamationmark.circle"}
+              name={statusStyles.iconName}
               color={COLORS.white}
             />
-            <Text style={styles.statusText}>In Progress</Text>
+            <Text style={styles.statusText}>{tripData[0].status}</Text>
           </View>
         </View>
       </View>
@@ -38,7 +82,7 @@ const TripCard = () => {
             name={"mappin.circle.fill"}
             color={COLORS.secondary}
           />
-          <Text style={styles.badgeText}>3 Stops</Text>
+          <Text style={styles.badgeText}>{tripData.length} Stops</Text>
         </View>
         <View style={styles.badge}>
           <IconSymbol
@@ -55,51 +99,18 @@ const TripCard = () => {
       </View>
 
       {/* TRIP DETAIL INFORMATION */}
-      <View style={styles.detailContainer}>
-        <View style={styles.numberCircleContainer}>
-          <Text style={styles.numberCircleText}>1</Text>
+      {tripData.map((trip, index) => (
+        <View style={styles.detailContainer} key={trip.id}>
+          <View style={styles.numberCircleContainer}>
+            <Text style={styles.numberCircleText}>{index + 1}</Text>
+          </View>
+          <View>
+            <Text style={styles.storeName}>{trip.storename}</Text>
+            <Text style={styles.storeAddress}>{trip.address}</Text>
+            <Text style={styles.storeTime}>TIME</Text>
+          </View>
         </View>
-        <View>
-          <Text style={styles.storeName}>Store Name</Text>
-          <Text style={styles.storeAddress}>Store Address</Text>
-          <Text style={styles.storeTime}>TIME</Text>
-        </View>
-      </View>
-      {/*  */}
-
-      {/* TRIP DETAIL INFORMATION */}
-      <View style={styles.detailContainer}>
-        <View style={styles.numberCircleContainer}>
-          <Text style={styles.numberCircleText}>1</Text>
-        </View>
-        <View>
-          <Text style={styles.storeName}>Store Name</Text>
-          <Text style={styles.storeAddress}>Store Address</Text>
-          <Text style={styles.storeTime}>TIME</Text>
-        </View>
-      </View>
-      {/* TRIP DETAIL INFORMATION */}
-      <View style={styles.detailContainer}>
-        <View style={styles.numberCircleContainer}>
-          <Text style={styles.numberCircleText}>1</Text>
-        </View>
-        <View>
-          <Text style={styles.storeName}>Store Name</Text>
-          <Text style={styles.storeAddress}>Store Address</Text>
-          <Text style={styles.storeTime}>TIME</Text>
-        </View>
-      </View>
-      {/* TRIP DETAIL INFORMATION */}
-      <View style={styles.detailContainer}>
-        <View style={styles.numberCircleContainer}>
-          <Text style={styles.numberCircleText}>1</Text>
-        </View>
-        <View>
-          <Text style={styles.storeName}>Store Name</Text>
-          <Text style={styles.storeAddress}>Store Address</Text>
-          <Text style={styles.storeTime}>TIME</Text>
-        </View>
-      </View>
+      ))}
     </View>
   );
 };
@@ -108,7 +119,6 @@ export default TripCard;
 
 const styles = StyleSheet.create({
   card: {
-    // borderWidth: 2,
     backgroundColor: COLORS.white,
     borderRadius: 24,
     overflow: "hidden",
@@ -119,6 +129,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     paddingHorizontal: 20,
     paddingVertical: 30,
+    marginBottom: 15,
   },
   container: {
     flexDirection: "row",
@@ -146,11 +157,10 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   statusBadge: {
-    backgroundColor: COLORS.blue,
     borderRadius: 10,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 10,
+    paddingHorizontal: 7,
     paddingVertical: 3,
   },
   statusText: {

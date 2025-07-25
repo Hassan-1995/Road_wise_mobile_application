@@ -11,11 +11,11 @@ export const COLORS = {
 
   surfaceLight: "#CBD5E1",
 
-
   //   different places
+  red: "#EF4444",
   amber: "#FBBF24",
+  green: "#4ADE80",
   blue: "#60A5FA",
-  // blue: "#93C5FD",
+
   grey: "#D1D5DB",
-  
 } as const;

@@ -4,9 +4,9 @@ import client from "./client";
 
 const endpoint = "/api/dropout-assignment";
 
-export const getDropoutAssignmentsByTrip = async (tripId: number) => {
+export const getDropoutAssignmentsByDriver = async (driverId: number) => {
   try {
-    const response = await client.get(`${endpoint}/trip/${tripId}`);
+    const response = await client.get(`${endpoint}/driver/${driverId}`);
     if (!response.ok) {
       console.error("Error fetching dropout assignments:", response.problem);
       throw new Error(response.problem);

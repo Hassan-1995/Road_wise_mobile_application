@@ -24,6 +24,8 @@ const MAPPING = {
   "mappin.circle.fill": "map-marker-outline",
   "exclamationmark.circle": "progress-alert",
   "clock.circle": "clock-outline",
+  "xmark.circle.fill": "selection-ellipse-remove",
+  "checkmark.circle.fill": "check-circle-outline",
 } as IconMapping;
 // const;
 
