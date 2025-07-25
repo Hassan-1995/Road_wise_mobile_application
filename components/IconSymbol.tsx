@@ -26,6 +26,11 @@ const MAPPING = {
   "clock.circle": "clock-outline",
   "xmark.circle.fill": "selection-ellipse-remove",
   "checkmark.circle.fill": "check-circle-outline",
+  "car.fill": "car-clock",
+  "location.fill": "map-marker-check",
+  "clipboard.fill": "clipboard-text",
+  "person.fill": "account-details",
+  "box.truck.fill": "truck-check",
 } as IconMapping;
 // const;
 

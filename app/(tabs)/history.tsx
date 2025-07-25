@@ -1,14 +1,20 @@
+import LogCard from "@/components/LogCard";
+import Screen from "@/components/Screen";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
 const DeliveryLog = () => {
   return (
-    <View>
-      <Text>DeliveryLog</Text>
-    </View>
+    <Screen>
+      <ScrollView>
+        <LogCard />
+      </ScrollView>
+    </Screen>
   );
 };
 
 export default DeliveryLog;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  header: {},
+});
