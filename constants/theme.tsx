@@ -8,7 +8,6 @@ export const COLORS = {
   black: "#000000",
   white: "#FFFFFF",
   background: "#F9FAFB",
-
   surfaceLight: "#CBD5E1",
 
   //   different places
@@ -16,6 +15,5 @@ export const COLORS = {
   amber: "#FBBF24",
   green: "#4ADE80",
   blue: "#60A5FA",
-
   grey: "#D1D5DB",
 } as const;

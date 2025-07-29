@@ -43,6 +43,9 @@ const TripCard = ({ tripData }: TripCardProps) => {
     }
   };
   const statusStyles = getStatusStyles(tripData[0].status);
+
+  
+
   return (
     <View style={styles.card}>
       {/* TRIP HEADER */}

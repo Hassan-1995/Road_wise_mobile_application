@@ -31,6 +31,8 @@ const MAPPING = {
   "clipboard.fill": "clipboard-text",
   "person.fill": "account-details",
   "box.truck.fill": "truck-check",
+  "flag.checkered":"flag-variant-outline",
+  "location.north.line": "map-marker-distance"
 } as IconMapping;
 // const;
 

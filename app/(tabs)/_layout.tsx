@@ -3,23 +3,25 @@ import { COLORS } from "@/constants/theme";
 import { Tabs } from "expo-router";
 import React from "react";
 import { useColorScheme, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context"; // ✅ ADD THIS
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets(); // ✅ ADD THIS
 
   const activeTintColor = colorScheme === "dark" ? "#1E40AF" : "#1E3A8A";
   const inactiveTintColor = colorScheme === "dark" ? "#94A3B8" : "#64748B";
 
   const screenOptions = {
-    // headerShown: false,
     tabBarShowLabel: false,
     tabBarActiveTintColor: activeTintColor,
     tabBarInactiveTintColor: inactiveTintColor,
     tabBarStyle: {
-      backgroundColor: colorScheme === "dark" ? "#1F2937" : "#FFFFFF", // gray-800 / white
+      backgroundColor: colorScheme === "dark" ? "#1F2937" : "#FFFFFF",
       borderTopWidth: 0,
       elevation: 10,
-      height: 60,
+      height: 40 + insets.bottom,
+      paddingBottom: insets.bottom,
     },
   } as const;
 
@@ -33,7 +35,7 @@ export default function TabLayout() {
     {
       name: "history",
       icon: "clock.arrow.circlepath",
-      header: "Trip HIstory",
+      header: "Trip History",
       headerIcon: "car.fill",
     },
     {
@@ -63,7 +65,6 @@ export default function TabLayout() {
           key={tab.name}
           name={tab.name}
           options={{
-            //
             headerShown: tab.name === "index" ? false : true,
             headerTitle: tab.header,
             headerStyle: { backgroundColor: COLORS.primary },
@@ -77,7 +78,6 @@ export default function TabLayout() {
                 />
               </View>
             ),
-            //
             tabBarIcon: ({ color }) => (
               <IconSymbol size={28} name={tab.icon} color={color} />
             ),
