@@ -65,7 +65,13 @@ export default function TabLayout() {
           key={tab.name}
           name={tab.name}
           options={{
-            headerShown: tab.name === "index" ? false : true,
+            headerShown:
+              tab.name === "index" ||
+              tab.name === "location" ||
+              tab.name === "activity"
+                ? false
+                : true,
+            // tab.name === "index" ? false : true,
             headerTitle: tab.header,
             headerStyle: { backgroundColor: COLORS.primary },
             headerTintColor: COLORS.white,

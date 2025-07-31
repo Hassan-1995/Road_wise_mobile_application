@@ -31,8 +31,25 @@ const MAPPING = {
   "clipboard.fill": "clipboard-text",
   "person.fill": "account-details",
   "box.truck.fill": "truck-check",
-  "flag.checkered":"flag-variant-outline",
-  "location.north.line": "map-marker-distance"
+  "flag.checkered": "flag-variant-outline",
+  "location.north.line": "map-marker-distance",
+  "point.topleft.down.curvedto.point.bottomright.up":
+    "navigation-variant-outline",
+  "square.and.pencil": "pencil-outline",
+  "person.crop.circle": "steering",
+  "person.text.rectangle": "card-account-details-outline",
+  "figure.stand.line.dotted.figure.stand": "gender-non-binary",
+  "house.circle": "home-city-outline",
+  "car.circle": "license",
+  "calendar.circle": "calendar-account-outline",
+  "calendar.badge.plus": "calendar-plus",
+  "phone.circle.fill": "phone",
+  "car.side": "car-cog",
+  "fuelpump.fill": "gas-station",
+  "plus.circle.fill": "notebook-plus",
+  "wrench.and.screwdriver": "tools",
+  "gearshape.2.fill": "auto-fix",
+  "chart.bar.doc.horizontal": "chart-bar",
 } as IconMapping;
 // const;
 
