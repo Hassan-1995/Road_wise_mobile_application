@@ -11,6 +11,24 @@ const STACKS = [
     headerIcon: "car.side",
     showHeader: true,
   },
+  {
+    name: "fuelEntry",
+    header: "Add Fuel Entry",
+    headerIcon: "fuelpump.fill",
+    showHeader: true,
+  },
+  {
+    name: "serviceEntry",
+    header: "Add Service Entry",
+    headerIcon: "wrench.and.screwdriver",
+    showHeader: true,
+  },
+  {
+    name: "repairEntry",
+    header: "Add Repair Entry",
+    headerIcon: "gearshape.2.fill",
+    showHeader: true,
+  },
 ];
 
 export default function HomeStackLayout() {

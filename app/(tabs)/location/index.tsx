@@ -6,8 +6,9 @@ import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
 import useCurrentLocation from "@/hooks/useCurrentLocation";
 import { useTripStore } from "@/stores/useTripStore";
+import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -54,32 +55,56 @@ const MapLocation = () => {
   const [routeCoords, setRouteCoords] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const driverId = 11; //static driver_id
+  // const driverId = 11; //static driver_id
+  const driverId = 1; //static driver_id
   // gets trips + store from back-end
-  useEffect(() => {
-    const fetchDropoutAssignment = async () => {
-      try {
-        setLoading(true);
-        const fetchedData = await getDropoutAssignmentsByDriver(driverId);
-        const filtered = filterByDate(
-          fetchedData as DropoutAssignment[],
-          "2025-07-28"
-          // new Date().toISOString().slice(0, 10)
-        );
-        const groupedData = groupByTripId(filtered as DropoutAssignment[]);
-        setData(groupedData);
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error("API error:", error.message, error);
-        } else {
+  // useEffect(() => {
+  //   const fetchDropoutAssignment = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const fetchedData = await getDropoutAssignmentsByDriver(driverId);
+  //       const filtered = filterByDate(
+  //         fetchedData as DropoutAssignment[],
+  //         "2025-07-28"
+  //         // new Date().toISOString().slice(0, 10)
+  //       );
+  //       const groupedData = groupByTripId(filtered as DropoutAssignment[]);
+  //       setData(groupedData);
+  //     } catch (error) {
+  //       if (error instanceof Error) {
+  //         console.error("API error:", error.message, error);
+  //       } else {
+  //         console.error("API error:", error);
+  //       }
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchDropoutAssignment();
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchDropoutAssignment = async () => {
+        try {
+          setLoading(true);
+          const fetchedData = await getDropoutAssignmentsByDriver(driverId);
+          const filtered = filterByDate(
+            fetchedData as DropoutAssignment[],
+            "2025-07-28"
+          );
+          const groupedData = groupByTripId(filtered as DropoutAssignment[]);
+          setData(groupedData);
+        } catch (error) {
           console.error("API error:", error);
+        } finally {
+          setLoading(false);
         }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDropoutAssignment();
-  }, []);
+      };
+
+      fetchDropoutAssignment();
+    }, [])
+  );
   // gets store + drop-offs in optimised order
   useEffect(() => {
     const fetchOptimisedOrder = async () => {

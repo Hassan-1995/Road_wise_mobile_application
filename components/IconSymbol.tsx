@@ -46,10 +46,13 @@ const MAPPING = {
   "phone.circle.fill": "phone",
   "car.side": "car-cog",
   "fuelpump.fill": "gas-station",
-  "plus.circle.fill": "notebook-plus",
   "wrench.and.screwdriver": "tools",
   "gearshape.2.fill": "auto-fix",
+  "plus.circle.fill": "notebook-plus",
   "chart.bar.doc.horizontal": "chart-bar",
+  "creditcard.circle": "cash",
+  "note.text": "notebook",
+  gauge: "gauge",
 } as IconMapping;
 // const;
 

@@ -2,6 +2,7 @@ import { getVehicleInfo } from "@/api/vehicleInfo";
 import { IconSymbol } from "@/components/IconSymbol";
 import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ScrollView,
@@ -33,7 +34,8 @@ const Maintenance = () => {
 
   useEffect(() => {
     const fetchVehicleInfo = async () => {
-      const driverId = 11;
+      // const driverId = 11;
+      const driverId = 1;
       try {
         const fetchedData = await getVehicleInfo(driverId);
         // setData(fetchedData[0] as DriverProfile);
@@ -126,7 +128,10 @@ const Maintenance = () => {
 
             <TouchableOpacity
               style={styles.addButton}
-              onPress={() => console.log("Press")}
+              onPress={() => {
+                router.push("/activity/fuelEntry");
+                console.log("Press");
+              }}
             >
               <IconSymbol
                 size={20}
@@ -185,7 +190,10 @@ const Maintenance = () => {
 
             <TouchableOpacity
               style={styles.addButton}
-              onPress={() => console.log("Press")}
+              onPress={() => {
+                router.push("/activity/serviceEntry");
+                console.log("Press");
+              }}
             >
               <IconSymbol
                 size={20}
@@ -237,7 +245,10 @@ const Maintenance = () => {
 
             <TouchableOpacity
               style={styles.addButton}
-              onPress={() => console.log("Press")}
+              onPress={() => {
+                router.push("/activity/repairEntry");
+                console.log("Press");
+              }}
             >
               <IconSymbol
                 size={20}
@@ -275,6 +286,7 @@ const Maintenance = () => {
           </ScrollView>
         </View>
 
+        {/* Quick Stats */}
         <View style={styles.card}>
           <View style={styles.titleRow}>
             <IconSymbol

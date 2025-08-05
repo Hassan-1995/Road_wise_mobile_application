@@ -23,7 +23,8 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchDriverInfo = async () => {
-      const driverId = 11;
+      // const driverId = 11;
+      const driverId = 1;
       try {
         const fetchedData = await getDriverInfo(driverId);
         // setData(fetchedData[0] as DriverProfile);

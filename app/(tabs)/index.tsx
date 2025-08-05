@@ -53,7 +53,7 @@ const Trip = () => {
 
   useEffect(() => {
     const fetchDropoutAssignment = async () => {
-      const driverId = 11; //static driver_id
+      const driverId = 1; //static driver_id
       setLoading(true);
       try {
         const fetchedData = await getDropoutAssignmentsByDriver(driverId);

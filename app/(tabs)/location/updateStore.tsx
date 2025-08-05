@@ -15,7 +15,7 @@ const StoreUpdate = () => {
     alert(`Status updated to: ${updateStatus}`);
     try {
       const updateData = await updatingStatusByDriver(
-        11, // Replace with actual driverId if dynamic
+        1, // Replace with actual driverId if dynamic
         Number(storeId),
         Number(tripId),
         String(updateStatus)
