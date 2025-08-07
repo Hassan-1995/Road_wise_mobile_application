@@ -52,6 +52,9 @@ const MapLocation = () => {
   const [dropPoints, setDropPoints] = useState<DropPoints | null>(null);
   const [polyline, setPolyline] = useState<PolyPoints | null>(null);
 
+  const [dist, setDist] = useState<number | null>(null);
+  const [time, setTime] = useState<number | null>(null);
+
   const [routeCoords, setRouteCoords] = useState([]);
   const [loading, setLoading] = useState(true);
   const driverId = 1; //static driver_id
@@ -125,6 +128,11 @@ const MapLocation = () => {
 
         const data = await response.json();
 
+        const { distance, duration } = data.features[0].properties.summary;
+
+        setDist(Math.round(distance / 1000));
+        setTime(Math.round(duration / 60));
+
         const coords = data.features[0].geometry.coordinates.map(
           ([lng, lat]) => ({
             latitude: lat,
@@ -133,6 +141,7 @@ const MapLocation = () => {
         );
 
         setRouteCoords(coords);
+        console.log("Route: ", coords);
       } catch (error) {
         console.error("Error fetching route:", error);
       }
@@ -174,8 +183,46 @@ const MapLocation = () => {
     <Screen>
       <ScrollView>
         <View style={{ width: "100%", aspectRatio: 1 }}>
+          {/* Map container */}
           <Map dropPoints={dropPoints} routeCoords={routeCoords} trip={trip} />
+
+          {/* Overlay View */}
+          {polyline && (
+            <View
+              style={{
+                position: "absolute",
+                bottom: 16,
+                right: 16,
+                backgroundColor: "rgba(255, 255, 255, 0.95)", // slightly more opaque
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                borderRadius: 12,
+                minWidth: 140,
+                alignItems: "flex-start",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.15,
+                shadowRadius: 6,
+                elevation: 6, // Android shadow
+              }}
+            >
+              <Text style={{ fontWeight: "600", fontSize: 14, color: "#333" }}>
+                Approx. Distance: {dist} km
+              </Text>
+              <Text
+                style={{
+                  fontWeight: "500",
+                  fontSize: 13,
+                  color: "#666",
+                  marginTop: 2,
+                }}
+              >
+                ETA: {time} minutes
+              </Text>
+            </View>
+          )}
         </View>
+
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {data &&
             Object.entries(data).map(([tripId, assignments]) => (
@@ -297,7 +344,7 @@ const MapLocation = () => {
 
               if (!dropPoints || !routeCoords) return;
 
-              setTripData(trip, dropPoints, routeCoords);
+              setTripData(trip, dropPoints, routeCoords, dist || 0, time || 0);
 
               // Optional: delay navigation to allow React to re-render
               setTimeout(() => {

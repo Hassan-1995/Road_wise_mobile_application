@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 const LiveLocation = () => {
-  const { trip, dropPoints, routeCoords } = useTripStore();
+  const { trip, dropPoints, routeCoords, dist, time } = useTripStore();
 
   const [currentTime, setCurrentTime] = useState("");
 
@@ -42,15 +42,58 @@ const LiveLocation = () => {
             style={{
               position: "absolute",
               bottom: 30,
-              left: 10,
-              backgroundColor: "rgba(0,0,0,0.6)",
-              padding: 10,
-              borderRadius: 8,
+              paddingHorizontal: 5,
+              // left: 10,
+              width: "100%",
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
-              {currentTime}
-            </Text>
+            <View>
+              <Text
+                style={{
+                  padding: 10,
+                  borderRadius: 8,
+                  backgroundColor: "rgba(0,0,0,0.6)",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  fontSize: 16,
+                }}
+              >
+                {currentTime}
+              </Text>
+            </View>
+            <View
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.95)", // slightly more opaque
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                borderRadius: 12,
+                minWidth: 140,
+                alignItems: "flex-start",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.15,
+                shadowRadius: 6,
+                elevation: 6, // Android shadow
+              }}
+            >
+              <Text style={{ fontWeight: "600", fontSize: 14, color: "#333" }}>
+                Approx. Distance: {dist} km
+              </Text>
+              <Text
+                style={{
+                  fontWeight: "500",
+                  fontSize: 13,
+                  color: "#666",
+                  marginTop: 2,
+                }}
+              >
+                ETA: {time} minutes
+              </Text>
+            </View>
           </View>
         </View>
       </View>
