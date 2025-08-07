@@ -54,35 +54,8 @@ const MapLocation = () => {
 
   const [routeCoords, setRouteCoords] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // const driverId = 11; //static driver_id
   const driverId = 1; //static driver_id
   // gets trips + store from back-end
-  // useEffect(() => {
-  //   const fetchDropoutAssignment = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const fetchedData = await getDropoutAssignmentsByDriver(driverId);
-  //       const filtered = filterByDate(
-  //         fetchedData as DropoutAssignment[],
-  //         "2025-07-28"
-  //         // new Date().toISOString().slice(0, 10)
-  //       );
-  //       const groupedData = groupByTripId(filtered as DropoutAssignment[]);
-  //       setData(groupedData);
-  //     } catch (error) {
-  //       if (error instanceof Error) {
-  //         console.error("API error:", error.message, error);
-  //       } else {
-  //         console.error("API error:", error);
-  //       }
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchDropoutAssignment();
-  // }, []);
-
   useFocusEffect(
     useCallback(() => {
       const fetchDropoutAssignment = async () => {
@@ -91,7 +64,7 @@ const MapLocation = () => {
           const fetchedData = await getDropoutAssignmentsByDriver(driverId);
           const filtered = filterByDate(
             fetchedData as DropoutAssignment[],
-            "2025-07-28"
+            "2025-08-07"
           );
           const groupedData = groupByTripId(filtered as DropoutAssignment[]);
           setData(groupedData);
