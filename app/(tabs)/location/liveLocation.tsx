@@ -1,6 +1,8 @@
+import AppButton from "@/components/AppButton";
 import Map from "@/components/Map";
 import Screen from "@/components/Screen";
 import { useTripStore } from "@/stores/useTripStore";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -41,7 +43,7 @@ const LiveLocation = () => {
           <View
             style={{
               position: "absolute",
-              bottom: 30,
+              bottom: 10,
               paddingHorizontal: 5,
               // left: 10,
               width: "100%",
@@ -65,7 +67,7 @@ const LiveLocation = () => {
                 {currentTime}
               </Text>
             </View>
-            <View
+            {/* <View
               style={{
                 backgroundColor: "rgba(255, 255, 255, 0.95)", // slightly more opaque
                 paddingVertical: 8,
@@ -93,6 +95,12 @@ const LiveLocation = () => {
               >
                 ETA: {time} minutes
               </Text>
+            </View> */}
+            <View>
+              <AppButton
+                title="Finish & Update"
+                onPress={() => router.push("/location/tripUpdate")}
+              />
             </View>
           </View>
         </View>

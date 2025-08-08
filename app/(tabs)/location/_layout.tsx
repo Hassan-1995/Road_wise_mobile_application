@@ -23,44 +23,17 @@ const STACKS = [
     headerIcon: "square.and.pencil",
     showHeader: true,
   },
+  {
+    name: "tripUpdate",
+    header: "Update",
+    headerIcon: "square.and.pencil",
+    showHeader: true,
+  },
 ];
 
 export default function HomeStackLayout() {
   return (
     <Stack>
-      {/* <Stack.Screen
-        name="index"
-        options={{
-          title: "Drop Points",
-          headerStyle: {
-            backgroundColor: COLORS.primary,
-          },
-          headerTitleStyle: {
-            color: COLORS.white,
-          },
-          headerTintColor: COLORS.white,
-          headerRight: () => (
-            <View style={{ paddingRight: 20 }}>
-              <IconSymbol
-                name={"location.fill"}
-                size={24}
-                color={COLORS.white}
-              />
-            </View>
-          ),
-        }}
-      />
-      <Stack.Screen
-        name="liveLocation"
-        options={{
-          title: "Details",
-          headerStyle: {
-            backgroundColor: COLORS.primary,
-          },
-          headerTintColor: COLORS.white,
-        }}
-      /> */}
-
       {STACKS.map((screen) => (
         <Stack.Screen
           key={screen.name}
