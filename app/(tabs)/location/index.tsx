@@ -1,4 +1,5 @@
 import { getDropoutAssignmentsByDriver } from "@/api/dropoutAssignmentByDriver";
+import { createOptimisedPathEntry } from "@/api/optimisedPath";
 import AppButton from "@/components/AppButton";
 import { GetOptimisedPolyline } from "@/components/GetOptimisedPolyline";
 import Map from "@/components/Map";
@@ -6,6 +7,7 @@ import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
 import useCurrentLocation from "@/hooks/useCurrentLocation";
 import { useTripStore } from "@/stores/useTripStore";
+import polyline from "@mapbox/polyline";
 import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -50,12 +52,13 @@ const MapLocation = () => {
   );
   const [trip, setTrip] = useState<string>("000");
   const [dropPoints, setDropPoints] = useState<DropPoints | null>(null);
-  const [polyline, setPolyline] = useState<PolyPoints | null>(null);
+  const [poly, setPoly] = useState<PolyPoints | null>(null);
 
   const [dist, setDist] = useState<number | null>(null);
   const [time, setTime] = useState<number | null>(null);
 
   const [routeCoords, setRouteCoords] = useState([]);
+  const [polyString, setPolyString] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const driverId = 1; //static driver_id
   // gets trips + store from back-end
@@ -97,7 +100,7 @@ const MapLocation = () => {
       try {
         const polylineCoords = await GetOptimisedPolyline(start, dropoffs);
         console.log("POLY-LINE: ", polylineCoords);
-        setPolyline(polylineCoords as PolyPoints);
+        setPoly(polylineCoords as PolyPoints);
       } catch (error) {
         console.error("Error getting polyline:", error);
       }
@@ -108,11 +111,11 @@ const MapLocation = () => {
   // gets polyline to display on the map
   useEffect(() => {
     const fetchRoute = async () => {
-      if (!polyline) {
+      if (!poly) {
         return;
       }
       try {
-        const coordinates = polyline?.map((pt) => [pt.longitude, pt.latitude]);
+        const coordinates = poly?.map((pt) => [pt.longitude, pt.latitude]);
 
         const response = await fetch(
           "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
@@ -141,7 +144,13 @@ const MapLocation = () => {
         );
 
         setRouteCoords(coords);
-        console.log("Route: ", coords);
+        const encoded = polyline.encode(
+          coords.map((p) => [p.latitude, p.longitude])
+        );
+
+        setPolyString(encoded);
+
+        console.log("Route: ", encoded);
       } catch (error) {
         console.error("Error fetching route:", error);
       }
@@ -339,12 +348,27 @@ const MapLocation = () => {
             title={
               trip === "000" ? "Select a Trip" : `TRP-${trip.padStart(3, "0")}`
             }
-            onPress={() => {
+            onPress={async () => {
               const { setTripData } = useTripStore.getState();
 
               if (!dropPoints || !routeCoords) return;
 
               setTripData(trip, dropPoints, routeCoords, dist || 0, time || 0);
+
+              try {
+                await createOptimisedPathEntry({
+                  tripId: Number(trip),
+                  optimisedPath: polyString!,
+                  distanceKm: String(dist || 0),
+                  durationMinutes: String(time || 0),
+                  startTime: new Date().toISOString(),
+                  status: "Ongoing",
+                });
+
+                console.log("Trip entry created successfully");
+              } catch (error) {
+                console.error("Failed to create trip entry:", error);
+              }
 
               // Optional: delay navigation to allow React to re-render
               setTimeout(() => {
