@@ -2,6 +2,7 @@ import { getDropoutAssignmentsByDriver } from "@/api/dropoutAssignmentByDriver";
 import { createOptimisedPathEntry } from "@/api/optimisedPath";
 import AppButton from "@/components/AppButton";
 import { GetOptimisedPolyline } from "@/components/GetOptimisedPolyline";
+import { startBackgroundLocationTracking } from "@/components/LocationTask";
 import Map from "@/components/Map";
 import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
@@ -354,6 +355,8 @@ const MapLocation = () => {
               if (!dropPoints || !routeCoords) return;
 
               setTripData(trip, dropPoints, routeCoords, dist || 0, time || 0);
+
+              startBackgroundLocationTracking(String(driverId), trip);
 
               try {
                 await createOptimisedPathEntry({

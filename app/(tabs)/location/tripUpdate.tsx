@@ -1,6 +1,8 @@
 import { updateTripStatusOrEndTime } from "@/api/optimisedPath_statusOrEndtime"; // your backend API
 import AppButton from "@/components/AppButton";
+import { stopBackgroundLocationTracking } from "@/components/LocationTask";
 import Screen from "@/components/Screen";
+import { COLORS } from "@/constants/theme";
 import { useTripStore } from "@/stores/useTripStore";
 import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
@@ -61,9 +63,12 @@ const TripUpdateScreen = () => {
           <Text style={styles.switchLabel}>End Trip</Text>
           <Switch
             value={endTrip}
-            onValueChange={setEndTrip}
-            trackColor={{ false: "#ccc", true: "#4caf50" }}
-            thumbColor={endTrip ? "#fff" : "#fff"}
+            onValueChange={() => {
+              setEndTrip((prev) => !prev);
+              stopBackgroundLocationTracking();
+            }}
+            trackColor={{ false: COLORS.green, true: COLORS.red }}
+            thumbColor={endTrip ? COLORS.primary : COLORS.primary}
           />
         </View>
 

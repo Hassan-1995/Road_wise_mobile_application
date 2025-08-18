@@ -1,6 +1,7 @@
 import AppButton from "@/components/AppButton";
 import Map from "@/components/Map";
 import Screen from "@/components/Screen";
+import useCurrentLocation from "@/hooks/useCurrentLocation";
 import { useTripStore } from "@/stores/useTripStore";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -8,6 +9,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 const LiveLocation = () => {
   const { trip, dropPoints, routeCoords, dist, time } = useTripStore();
+  const { location, region } = useCurrentLocation();
 
   const [currentTime, setCurrentTime] = useState("");
 
@@ -31,6 +33,12 @@ const LiveLocation = () => {
       </View>
     );
   }
+
+  // console.log(
+  //   "Testing Data:",
+  //   location?.coords.latitude,
+  //   location?.coords.longitude
+  // );
 
   return (
     <Screen>
@@ -99,7 +107,8 @@ const LiveLocation = () => {
             <View>
               <AppButton
                 title="Finish & Update"
-                onPress={() => router.push("/location/tripUpdate")}
+                onPress={() => 
+                  router.push("/location/tripUpdate")}
               />
             </View>
           </View>

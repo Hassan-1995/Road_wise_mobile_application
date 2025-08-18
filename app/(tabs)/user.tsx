@@ -1,7 +1,10 @@
 import { getDriverInfo } from "@/api/driverInfo";
+import AppButton from "@/components/AppButton";
 import { IconSymbol } from "@/components/IconSymbol";
 import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
+import { useAuthStore } from "@/stores/authStore";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 
@@ -20,6 +23,14 @@ type DriverProfile = {
 const Profile = () => {
   const [data, setData] = useState<DriverProfile | null>(null);
   const [isActive, setIsActive] = useState(true);
+
+  const logout = useAuthStore((s) => s.logout);
+  const user = useAuthStore((s) => s.user);
+
+  const onLogout = () => {
+    logout();
+    router.replace("/login");
+  };
 
   useEffect(() => {
     const fetchDriverInfo = async () => {
@@ -233,6 +244,7 @@ const Profile = () => {
               style={{ transform: [{ scaleX: 1.4 }, { scaleY: 1.4 }] }}
             />
           </View>
+          <AppButton title="Logout" onPress={onLogout} />
         </View>
       </ScrollView>
     </Screen>
