@@ -1,4 +1,5 @@
 import { getDriverInfo } from "@/api/driverInfo";
+import { getDriverID } from "@/api/getDriverID";
 import AppButton from "@/components/AppButton";
 import { IconSymbol } from "@/components/IconSymbol";
 import Screen from "@/components/Screen";
@@ -34,10 +35,14 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchDriverInfo = async () => {
-      // const driverId = 11;
-      const driverId = 1;
+      // const driverId = 1;
+      // const driverId = (user && user.id) || 0;
+
+      const driverId = (await getDriverID(user?.id || 0)) as { id: number };
+      console.log("Driver ID: ", driverId.id);
       try {
-        const fetchedData = await getDriverInfo(driverId);
+        // const fetchedData = await getDriverInfoNew(driverId.id);
+        const fetchedData = await getDriverInfo(driverId.id);
         // setData(fetchedData[0] as DriverProfile);
         setData((fetchedData as DriverProfile[])[0]);
         console.log("Fetched Data:", fetchedData);
@@ -46,7 +51,7 @@ const Profile = () => {
       }
     };
     fetchDriverInfo();
-  }, []);
+  }, [user]);
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -85,9 +90,12 @@ const Profile = () => {
               color={COLORS.primary}
             />
             <Text style={styles.nameText}>{data && data.name}</Text>
+            {/* <Text style={styles.nameText}>{user?.id}</Text>
+            <Text style={styles.nameText}>{user?.name}</Text> */}
             <Text>
               DRV-{data && new Date(data.createdAt).getFullYear()}-
               {data && String(data.id).padStart(3, "0")}
+              {/* DRV-{String(user?.id).padStart(3, "0")} */}
             </Text>
           </View>
         </View>

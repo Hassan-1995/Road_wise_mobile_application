@@ -1,9 +1,11 @@
 // before implementation
 import { getDropoutAssignmentsByDriver } from "@/api/dropoutAssignmentByDriver";
+import { getDriverID } from "@/api/getDriverID";
 import { IconSymbol } from "@/components/IconSymbol";
 import Screen from "@/components/Screen";
 import TripCard from "@/components/TripCard";
 import { COLORS } from "@/constants/theme";
+import { useAuthStore } from "@/stores/authStore";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
 import {
@@ -30,6 +32,7 @@ type DropoutAssignment = {
 };
 
 const Trip = () => {
+  const user = useAuthStore((s) => s.user);
   const [data, setData] = useState<Record<number, DropoutAssignment[]> | null>(
     null
   );
@@ -53,10 +56,11 @@ const Trip = () => {
 
   useEffect(() => {
     const fetchDropoutAssignment = async () => {
-      const driverId = 1; //static driver_id
+      // const driverId = 1; //static driver_id
+      const driverId = (await getDriverID(user?.id || 0)) as { id: number };
       setLoading(true);
       try {
-        const fetchedData = await getDropoutAssignmentsByDriver(driverId);
+        const fetchedData = await getDropoutAssignmentsByDriver(driverId.id);
         const filtered = selectedDate
           ? filterByDate(fetchedData as DropoutAssignment[], selectedDate)
           : fetchedData;

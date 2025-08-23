@@ -1,4 +1,5 @@
 import { getDropoutAssignmentsByDriver } from "@/api/dropoutAssignmentByDriver";
+import { getDriverID } from "@/api/getDriverID";
 import { createOptimisedPathEntry } from "@/api/optimisedPath";
 import AppButton from "@/components/AppButton";
 import { GetOptimisedPolyline } from "@/components/GetOptimisedPolyline";
@@ -7,6 +8,7 @@ import Map from "@/components/Map";
 import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
 import useCurrentLocation from "@/hooks/useCurrentLocation";
+import { useAuthStore } from "@/stores/authStore";
 import { useTripStore } from "@/stores/useTripStore";
 import polyline from "@mapbox/polyline";
 import { useFocusEffect } from "@react-navigation/native";
@@ -46,6 +48,7 @@ type PolyPoints = {
 }[];
 
 const MapLocation = () => {
+  const user = useAuthStore((s) => s.user);
   const { location, region } = useCurrentLocation();
 
   const [data, setData] = useState<Record<number, DropoutAssignment[]> | null>(
@@ -62,16 +65,18 @@ const MapLocation = () => {
   const [polyString, setPolyString] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const driverId = 1; //static driver_id
+
   // gets trips + store from back-end
   useFocusEffect(
     useCallback(() => {
       const fetchDropoutAssignment = async () => {
         try {
+          const driverId = (await getDriverID(user?.id || 0)) as { id: number };
           setLoading(true);
-          const fetchedData = await getDropoutAssignmentsByDriver(driverId);
+          const fetchedData = await getDropoutAssignmentsByDriver(driverId.id);
           const filtered = filterByDate(
             fetchedData as DropoutAssignment[],
-            "2025-08-07"
+            new Date().toISOString().split("T")[0]
           );
           const groupedData = groupByTripId(filtered as DropoutAssignment[]);
           setData(groupedData);
@@ -145,8 +150,11 @@ const MapLocation = () => {
         );
 
         setRouteCoords(coords);
-        const encoded = polyline.encode(
-          coords.map((p) => [p.latitude, p.longitude])
+        const encoded: string = polyline.encode(
+          coords.map((p: { latitude: number; longitude: number }) => [
+            p.latitude,
+            p.longitude,
+          ])
         );
 
         setPolyString(encoded);
@@ -293,7 +301,8 @@ const MapLocation = () => {
                             store: item.storename,
                             address: item.address,
                             status: item.status,
-                            location: [item.latitude, item.longitude],
+                            storeLocation: [item.latitude, item.longitude],
+                            // location: [item.latitude, item.longitude],
                             tripId: item.tripId,
                             storeId: item.storeId,
                             // key2: "value2",
