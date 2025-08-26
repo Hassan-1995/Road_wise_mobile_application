@@ -38,6 +38,7 @@ const Trip = () => {
   );
   const [loading, setLoading] = useState(true);
   const [trips, setTrips] = useState(0);
+  const [pending, setPending] = useState(0);
 
   const [showPicker, setShowPicker] = useState(false);
   const [displayedDate, setDisplayedDate] = useState(() => {
@@ -67,6 +68,11 @@ const Trip = () => {
         const groupedData = groupByTripId(filtered as DropoutAssignment[]);
         setData(groupedData);
         setTrips(Object.keys(groupedData).length);
+        setPending(
+          Object.values(groupedData).filter((group) =>
+            group.some((order) => order.status === "Pending")
+          ).length
+        );
       } catch (error) {
         if (error instanceof Error) {
           console.error("API error:", error.message, error);
@@ -77,7 +83,7 @@ const Trip = () => {
       setLoading(false);
     };
     fetchDropoutAssignment();
-  }, [selectedDate]);
+  }, [selectedDate, user?.id]);
 
   // Utility function to group the fetchedData by tripId
   const groupByTripId = (
@@ -138,8 +144,8 @@ const Trip = () => {
               <Text style={styles.label}>Total Trips</Text>
             </View>
             <View style={styles.infoBox}>
-              <Text style={styles.activeCount}>2</Text>
-              <Text style={styles.label}>Active</Text>
+              <Text style={styles.activeCount}>{pending}</Text>
+              <Text style={styles.label}>Pending</Text>
             </View>
           </View>
         </View>

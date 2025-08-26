@@ -53,6 +53,8 @@ const MAPPING = {
   "creditcard.circle": "cash",
   "note.text": "notebook",
   gauge: "gauge",
+  "building.2": "store",
+  "car-outline": "truck-fast-outline",
 } as IconMapping;
 // const;
 

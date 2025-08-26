@@ -1,4 +1,5 @@
 import { updateTripStatusOrEndTime } from "@/api/optimisedPath_statusOrEndtime"; // your backend API
+import { setTripTime } from "@/api/tripTime";
 import AppButton from "@/components/AppButton";
 import { stopBackgroundLocationTracking } from "@/components/LocationTask";
 import Screen from "@/components/Screen";
@@ -63,9 +64,20 @@ const TripUpdateScreen = () => {
           <Text style={styles.switchLabel}>End Trip</Text>
           <Switch
             value={endTrip}
-            onValueChange={() => {
+            onValueChange={async () => {
               setEndTrip((prev) => !prev);
               stopBackgroundLocationTracking();
+
+              try {
+                await setTripTime({
+                  tripId: Number(trip),
+                  endTime: new Date().toISOString(),
+                });
+                alert("Trip time ended successfully");
+              } catch (error) {
+                console.error("Failed to stop trip end time:", error);
+                alert("Failed to stop trip end time:" + error);
+              }
             }}
             trackColor={{ false: COLORS.green, true: COLORS.red }}
             thumbColor={endTrip ? COLORS.primary : COLORS.primary}

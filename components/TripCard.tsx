@@ -21,20 +21,20 @@ type TripCardProps = {
 };
 
 const TripCard = ({ tripData }: TripCardProps) => {
-  const getStatusStyles = (status: "Pending" | "Completed" | "Cancelled") => {
+  const hasPending = tripData.some((order) => order.status === "Pending");
+
+  const getStatusStylesNew = (status: true | false) => {
     switch (status) {
-      case "Pending":
+      case true:
         return {
           backgroundColor: COLORS.blue,
           iconName: "clock.circle",
         };
-      case "Completed":
+      case false:
         return {
           backgroundColor: COLORS.green,
           iconName: "checkmark.circle.fill",
         };
-      case "Cancelled":
-        return { backgroundColor: COLORS.red, iconName: "xmark.circle.fill" };
       default:
         return {
           backgroundColor: COLORS.grey,
@@ -42,9 +42,8 @@ const TripCard = ({ tripData }: TripCardProps) => {
         };
     }
   };
-  const statusStyles = getStatusStyles(tripData[0].status);
 
-  
+  const statusStylesNew = getStatusStylesNew(hasPending);
 
   return (
     <View style={styles.card}>
@@ -64,15 +63,22 @@ const TripCard = ({ tripData }: TripCardProps) => {
           <View
             style={[
               styles.statusBadge,
-              { backgroundColor: statusStyles.backgroundColor },
+              // { backgroundColor: statusStyles.backgroundColor },
+              { backgroundColor: statusStylesNew.backgroundColor },
             ]}
           >
             <IconSymbol
               size={15}
-              name={statusStyles.iconName}
+              // name={statusStyles.iconName}
+              name={statusStylesNew.iconName}
               color={COLORS.white}
             />
-            <Text style={styles.statusText}>{tripData[0].status}</Text>
+            {/* <Text style={styles.statusText}>{tripData[0].status}</Text> */}
+            <Text style={styles.statusText}>
+              {tripData.some((order) => order.status === "Pending")
+                ? "On-Going"
+                : "Completed"}
+            </Text>
           </View>
         </View>
       </View>
@@ -87,14 +93,14 @@ const TripCard = ({ tripData }: TripCardProps) => {
           />
           <Text style={styles.badgeText}>{tripData.length} Stops</Text>
         </View>
-        <View style={styles.badge}>
+        {/* <View style={styles.badge}>
           <IconSymbol
             size={24}
             name={"clock.circle"}
             color={COLORS.secondary}
           />
           <Text style={styles.badgeText}>3h 45m</Text>
-        </View>
+        </View> */}
       </View>
 
       <View style={styles.dropOffContainer}>
@@ -110,7 +116,15 @@ const TripCard = ({ tripData }: TripCardProps) => {
           <View>
             <Text style={styles.storeName}>{trip.storename}</Text>
             <Text style={styles.storeAddress}>{trip.address}</Text>
-            <Text style={styles.storeTime}>TIME</Text>
+            <Text style={styles.storeTime}>
+              {new Date(trip.assignedAt)
+                .toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })
+                .toUpperCase()}
+            </Text>
           </View>
         </View>
       ))}
@@ -222,6 +236,6 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
   },
   storeTime: {
-    color: COLORS.surfaceLight,
+    color: COLORS.surface,
   },
 });

@@ -1,6 +1,7 @@
 import { getDropoutAssignmentsByDriver } from "@/api/dropoutAssignmentByDriver";
 import { getDriverID } from "@/api/getDriverID";
 import { createOptimisedPathEntry } from "@/api/optimisedPath";
+import { setTripTime } from "@/api/tripTime";
 import AppButton from "@/components/AppButton";
 import { GetOptimisedPolyline } from "@/components/GetOptimisedPolyline";
 import { startBackgroundLocationTracking } from "@/components/LocationTask";
@@ -376,10 +377,20 @@ const MapLocation = () => {
                   startTime: new Date().toISOString(),
                   status: "Ongoing",
                 });
-
                 console.log("Trip entry created successfully");
               } catch (error) {
                 console.error("Failed to create trip entry:", error);
+              }
+
+              try {
+                await setTripTime({
+                  tripId: Number(trip),
+                  startTime: new Date().toISOString(),
+                });
+                alert("Trip time started successfully");
+              } catch (error) {
+                console.error("Failed to create trip start time:", error);
+                alert("Failed to create trip start time:" + error);
               }
 
               // Optional: delay navigation to allow React to re-render

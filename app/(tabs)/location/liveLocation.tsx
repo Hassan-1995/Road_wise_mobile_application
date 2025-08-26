@@ -107,8 +107,7 @@ const LiveLocation = () => {
             <View>
               <AppButton
                 title="Finish & Update"
-                onPress={() => 
-                  router.push("/location/tripUpdate")}
+                onPress={() => router.push("/location/tripUpdate")}
               />
             </View>
           </View>
