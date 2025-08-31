@@ -1,4 +1,5 @@
 import { updateTripStatusOrEndTime } from "@/api/optimisedPath_statusOrEndtime"; // your backend API
+import { getTripDetail, Trip } from "@/api/tripByID";
 import { setTripTime } from "@/api/tripTime";
 import AppButton from "@/components/AppButton";
 import { stopBackgroundLocationTracking } from "@/components/LocationTask";
@@ -6,7 +7,7 @@ import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
 import { useTripStore } from "@/stores/useTripStore";
 import { Picker } from "@react-native-picker/picker";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Switch, Text, View } from "react-native";
 
 const TripUpdateScreen = () => {
@@ -38,6 +39,62 @@ const TripUpdateScreen = () => {
     }
   };
 
+  const checkEndTrip = async () => {
+    try {
+      const res = await setTripTime({
+        tripId: Number(trip),
+        endTime: new Date().toISOString(),
+      });
+      alert("Trip time ended successfully");
+      setEndTrip(true);
+    } catch (error) {
+      console.error("Failed to stop trip end time:", error);
+      alert("Failed to stop trip end time:" + error);
+    }
+    //   try {
+    //               const res = (await setTripTime({
+    //                 tripId: Number(trip),
+    //                 endTime: new Date().toISOString(),
+    //               })) as {
+    //                 alreadyExists: boolean;
+    //                 endTime: string;
+    //                 message: string;
+    //                 success: boolean;
+    //               };
+    //               console.log(res);
+    //               if (res.alreadyExists) {
+    //                 alert("Trip end time was already set at: " + res.endTime);
+    //                 setEndTrip(true); // force switch ON
+    //               } else {
+    //                 alert("Trip time ended successfully");
+    //                 setEndTrip(true); // set ON after success
+    //               }
+    //             } catch (error) {
+    //               console.error("Failed to stop trip end time:", error);
+    //               alert("Failed to stop trip end time:" + error);
+    //             }
+    //           }
+  };
+
+  useEffect(() => {
+    const fetchEndTripStatus = async () => {
+      try {
+        const response = (await getTripDetail({
+          tripID: Number(trip),
+        })) as Trip;
+        console.log("NEW: ", response);
+        if (response.endTime === null) {
+          setEndTrip(false);
+        } else {
+          setEndTrip(true);
+        }
+      } catch (error) {
+        console.error("Failed to stop trip end time:", error);
+      }
+    };
+    fetchEndTripStatus();
+  }, [trip]);
+
   return (
     <Screen>
       <View style={styles.container}>
@@ -62,22 +119,49 @@ const TripUpdateScreen = () => {
         {/* End Trip Toggle */}
         <View style={styles.switchRow}>
           <Text style={styles.switchLabel}>End Trip</Text>
-          <Switch
+          {/* <Switch
             value={endTrip}
             onValueChange={async () => {
-              setEndTrip((prev) => !prev);
+              // Prevent toggling back to false
+              if (endTrip) return;
+
               stopBackgroundLocationTracking();
 
               try {
-                await setTripTime({
+                const res = (await setTripTime({
                   tripId: Number(trip),
                   endTime: new Date().toISOString(),
-                });
-                alert("Trip time ended successfully");
+                })) as {
+                  alreadyExists: boolean;
+                  endTime: string;
+                  message: string;
+                  success: boolean;
+                };
+
+                console.log(res);
+
+                if (res.alreadyExists) {
+                  alert("Trip end time was already set at: " + res.endTime);
+                  setEndTrip(true); // force switch ON
+                } else {
+                  alert("Trip time ended successfully");
+                  setEndTrip(true); // set ON after success
+                }
               } catch (error) {
                 console.error("Failed to stop trip end time:", error);
                 alert("Failed to stop trip end time:" + error);
               }
+            }}
+            trackColor={{ false: COLORS.green, true: COLORS.red }}
+            thumbColor={endTrip ? COLORS.primary : COLORS.primary}
+          /> */}
+
+          <Switch
+            value={endTrip}
+            onValueChange={async () => {
+              if (endTrip) return; // ✅ lock once true
+              stopBackgroundLocationTracking();
+              await checkEndTrip();
             }}
             trackColor={{ false: COLORS.green, true: COLORS.red }}
             thumbColor={endTrip ? COLORS.primary : COLORS.primary}

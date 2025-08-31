@@ -41,3 +41,38 @@ export const setTripTime = async ({
     throw error;
   }
 };
+
+export const checkTripTime = async ({
+  tripId,
+  startTime,
+  endTime,
+}: {
+  tripId: number;
+  startTime?: string;
+  endTime?: string;
+}) => {
+  try {
+    // Decide which field we’re updating
+    let path = "";
+
+    if (startTime) {
+      path = "start-time";
+    } else if (endTime) {
+      path = "end-time";
+    } else {
+      throw new Error("Either startTime or endTime must be provided.");
+    }
+
+    const response = await client.get(`${endpoint}/${tripId}/${path}`);
+
+    if (!response.ok) {
+      console.error("Error checking trip time:", response.problem);
+      throw new Error(response.problem);
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Error checking trip time:", error);
+    throw error;
+  }
+};

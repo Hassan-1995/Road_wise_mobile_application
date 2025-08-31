@@ -1,7 +1,9 @@
+import { getDriverID } from "@/api/getDriverID";
 import { getVehicleInfo } from "@/api/vehicleInfo";
 import { IconSymbol } from "@/components/IconSymbol";
 import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
+import { useAuthStore } from "@/stores/authStore";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -30,14 +32,17 @@ type VehicleMaintenanceLog = {
 }[];
 
 const Maintenance = () => {
+  const user = useAuthStore((s) => s.user);
   const [data, setData] = useState<VehicleMaintenanceLog | null>(null);
 
   useEffect(() => {
     const fetchVehicleInfo = async () => {
       // const driverId = 11;
-      const driverId = 1;
+      // const driverId = 1;
+      const driverId = (await getDriverID(user?.id || 0)) as { id: number };
       try {
-        const fetchedData = await getVehicleInfo(driverId);
+        const fetchedData = await getVehicleInfo(driverId.id);
+        // const fetchedData = await getVehicleInfo(1);
         // setData(fetchedData[0] as DriverProfile);
         setData(fetchedData as VehicleMaintenanceLog);
         console.log("Fetched Data:", fetchedData);
@@ -46,7 +51,7 @@ const Maintenance = () => {
       }
     };
     fetchVehicleInfo();
-  }, []);
+  }, [user?.id]);
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -104,6 +109,7 @@ const Maintenance = () => {
     return sum.toLocaleString();
   };
 
+  console.log("DATA: ", data);
   return (
     <Screen>
       <ScrollView>

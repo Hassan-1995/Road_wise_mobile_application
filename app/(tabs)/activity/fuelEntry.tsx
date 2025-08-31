@@ -1,8 +1,10 @@
 import { fuelLogCreateEntry } from "@/api/fuelEntry";
+import { getDriverID } from "@/api/getDriverID";
 import AppButton from "@/components/AppButton";
 import { IconSymbol } from "@/components/IconSymbol";
 import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
+import { useAuthStore } from "@/stores/authStore";
 import React, { useState } from "react";
 import {
   Alert,
@@ -16,6 +18,7 @@ import {
 } from "react-native";
 
 const FuelLogEntry = () => {
+  const user = useAuthStore((s) => s.user);
   const [fuel, setFuel] = useState("");
   const [fuelCost, setFuelCost] = useState("");
   const [odometer, setOdometer] = useState("");
@@ -27,9 +30,10 @@ const FuelLogEntry = () => {
       console.log("Hello");
       return;
     }
+    const driverId = (await getDriverID(user?.id || 0)) as { id: number };
     try {
       const data = {
-        driverId: 1,
+        driverId: driverId.id,
         vehicleId: 1,
         liters: parseFloat(fuel),
         costRs: parseFloat(fuelCost),

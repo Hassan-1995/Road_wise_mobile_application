@@ -1,6 +1,7 @@
 import { getDropoutAssignmentsByDriver } from "@/api/dropoutAssignmentByDriver";
 import { getDriverID } from "@/api/getDriverID";
 import { createOptimisedPathEntry } from "@/api/optimisedPath";
+import { getTripDetail, Trip } from "@/api/tripByID";
 import { setTripTime } from "@/api/tripTime";
 import AppButton from "@/components/AppButton";
 import { GetOptimisedPolyline } from "@/components/GetOptimisedPolyline";
@@ -13,6 +14,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useTripStore } from "@/stores/useTripStore";
 import polyline from "@mapbox/polyline";
 import { useFocusEffect } from "@react-navigation/native";
+import * as Location from "expo-location";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -65,7 +67,7 @@ const MapLocation = () => {
   const [routeCoords, setRouteCoords] = useState([]);
   const [polyString, setPolyString] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const driverId = 1; //static driver_id
+  // const driverId = 1; //static driver_id
 
   // gets trips + store from back-end
   useFocusEffect(
@@ -89,7 +91,7 @@ const MapLocation = () => {
       };
 
       fetchDropoutAssignment();
-    }, [])
+    }, [user?.id])
   );
   // gets store + drop-offs in optimised order
   useEffect(() => {
@@ -166,7 +168,7 @@ const MapLocation = () => {
       }
     };
     fetchRoute();
-  }, [polyline, dropPoints]);
+  }, [dropPoints, poly]);
 
   // utility function
   const groupByTripId = (
@@ -366,8 +368,24 @@ const MapLocation = () => {
 
               setTripData(trip, dropPoints, routeCoords, dist || 0, time || 0);
 
-              startBackgroundLocationTracking(String(driverId), trip);
+              const driverId = (await getDriverID(user?.id || 0)) as {
+                id: number;
+              };
+              // startBackgroundLocationTracking(String(driverId.id), trip);
 
+              const hasStarted = await Location.hasStartedLocationUpdatesAsync(
+                "background-location-task"
+              );
+              if (!hasStarted) {
+                await startBackgroundLocationTracking(
+                  String(driverId.id),
+                  trip
+                );
+              } else {
+                console.log(
+                  "Background tracking already running — not restarting."
+                );
+              }
               try {
                 await createOptimisedPathEntry({
                   tripId: Number(trip),
@@ -383,11 +401,26 @@ const MapLocation = () => {
               }
 
               try {
-                await setTripTime({
-                  tripId: Number(trip),
-                  startTime: new Date().toISOString(),
-                });
-                alert("Trip time started successfully");
+                const response = (await getTripDetail({
+                  tripID: Number(trip),
+                })) as Trip;
+                if (response.startTime === null) {
+                  await setTripTime({
+                    tripId: Number(trip),
+                    startTime: new Date().toISOString(),
+                  });
+                  alert("Trip time started successfully");
+                } else {
+                  alert(
+                    "Trip time already started successfully at: " +
+                      new Date(response.startTime).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: true,
+                      })
+                  );
+                }
               } catch (error) {
                 console.error("Failed to create trip start time:", error);
                 alert("Failed to create trip start time:" + error);
