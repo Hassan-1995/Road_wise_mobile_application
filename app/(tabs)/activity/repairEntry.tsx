@@ -4,6 +4,7 @@ import { IconSymbol } from "@/components/IconSymbol";
 import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
 import { Picker } from "@react-native-picker/picker";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
@@ -24,7 +25,10 @@ const RepairLogEntry = () => {
 
   const handleRepairEntry = async () => {
     if (!repair || !repairCost || !odometer) {
-      console.log("Hello");
+      Alert.alert(
+        "Warning!",
+        "Repair Type, Repair Cost and Odometer cannot left empty."
+      );
       return;
     }
     try {
@@ -40,7 +44,14 @@ const RepairLogEntry = () => {
 
       const response = await repairLogCreateEntry(data);
 
-      Alert.alert("Success", "Repair log entry created successfully!");
+      // Alert.alert("Success", "Repair log entry created successfully!");
+      Alert.alert("Success!", "Repair log entry created successfully.", [
+        {
+          text: "OK",
+          // onPress: () => console.log("OK Pressed"),
+          onPress: () => router.back(),
+        },
+      ]);
       console.log(response);
     } catch (error) {
       console.error("Submission error:", error);

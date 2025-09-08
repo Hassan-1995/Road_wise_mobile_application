@@ -4,6 +4,7 @@ import { IconSymbol } from "@/components/IconSymbol";
 import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
 import { Picker } from "@react-native-picker/picker";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
@@ -25,7 +26,10 @@ const ServiceLogEntry = () => {
 
   const handleServiceEntry = async () => {
     if (!service || !serviceCost || !odometer) {
-      console.log("Hello");
+      Alert.alert(
+        "Warning!",
+        "Service Type, Service Cost and Odometer cannot left empty."
+      );
       return;
     }
     try {
@@ -41,7 +45,13 @@ const ServiceLogEntry = () => {
 
       const response = await serviceLogCreateEntry(data);
 
-      Alert.alert("Success", "Service log entry created successfully!");
+      Alert.alert("Success!", "Service log entry created successfully.", [
+        {
+          text: "OK",
+          // onPress: () => console.log("OK Pressed"),
+          onPress: () => router.back(),
+        },
+      ]);
       console.log(response);
     } catch (error) {
       console.error("Submission error:", error);

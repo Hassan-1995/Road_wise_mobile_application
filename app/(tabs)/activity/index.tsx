@@ -4,8 +4,9 @@ import { IconSymbol } from "@/components/IconSymbol";
 import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
 import { useAuthStore } from "@/stores/authStore";
+import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -35,23 +36,32 @@ const Maintenance = () => {
   const user = useAuthStore((s) => s.user);
   const [data, setData] = useState<VehicleMaintenanceLog | null>(null);
 
-  useEffect(() => {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
+
+  useFocusEffect(() => {
     const fetchVehicleInfo = async () => {
-      // const driverId = 11;
-      // const driverId = 1;
       const driverId = (await getDriverID(user?.id || 0)) as { id: number };
       try {
-        const fetchedData = await getVehicleInfo(driverId.id);
-        // const fetchedData = await getVehicleInfo(1);
-        // setData(fetchedData[0] as DriverProfile);
-        setData(fetchedData as VehicleMaintenanceLog);
+        const fetchedData = (await getVehicleInfo(
+          driverId.id
+        )) as VehicleMaintenanceLog;
+        setData(
+          fetchedData.filter((item) => {
+            const d = new Date(item.createdAt);
+            return (
+              d.getMonth() === currentMonth && d.getFullYear() === currentYear
+            );
+          }) as VehicleMaintenanceLog
+        );
         console.log("Fetched Data:", fetchedData);
       } catch (error) {
         console.error("API error:", error);
       }
     };
     fetchVehicleInfo();
-  }, [user?.id]);
+  });
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -77,18 +87,6 @@ const Maintenance = () => {
 
     return `${day} ${month}`;
   };
-
-  //   const totalFuelCost = data
-  //     .filter((item) => item.liters !== null)
-  //     .reduce((sum, item) => sum + parseFloat(item.costRs), 0);
-
-  //   const totalServiceCost = data
-  //     .filter((item) => item.serviceType !== null)
-  //     .reduce((sum, item) => sum + parseFloat(item.costRs), 0);
-
-  //   const totalRepairCost = data
-  //     .filter((item) => item.repairType !== null)
-  //     .reduce((sum, item) => sum + parseFloat(item.costRs), 0);
 
   const TotalFuelCost = (data: VehicleMaintenanceLog) => {
     const sum = data
@@ -172,7 +170,9 @@ const Maintenance = () => {
                       <Text>
                         Avg:{" "}
                         {fuel.liters && parseFloat(fuel.costRs)
-                          ? (parseFloat(fuel.costRs) / fuel.liters).toFixed(2)
+                          ? (parseFloat(fuel.costRs) / fuel.liters)
+                              .toFixed(2)
+                              .toLocaleString()
                           : "N/A"}{" "}
                         Rs/L
                       </Text>
@@ -346,7 +346,7 @@ const Maintenance = () => {
               }}
             >
               <Text>🔧</Text>
-              <Text>Service Cost</Text>
+              <Text>Repair Cost</Text>
               <Text style={styles.sectionTitle}>
                 {data && TotalRepairCost(data)}
               </Text>

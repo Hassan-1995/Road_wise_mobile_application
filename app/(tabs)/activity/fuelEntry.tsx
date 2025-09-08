@@ -5,6 +5,7 @@ import { IconSymbol } from "@/components/IconSymbol";
 import Screen from "@/components/Screen";
 import { COLORS } from "@/constants/theme";
 import { useAuthStore } from "@/stores/authStore";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
@@ -27,7 +28,10 @@ const FuelLogEntry = () => {
 
   const handleFuelEntry = async () => {
     if (!fuel || !fuelCost || !odometer) {
-      console.log("Hello");
+      Alert.alert(
+        "Warning!",
+        "Fuel Amount, Fuel Cost and Odometer cannot left empty."
+      );
       return;
     }
     const driverId = (await getDriverID(user?.id || 0)) as { id: number };
@@ -44,7 +48,14 @@ const FuelLogEntry = () => {
 
       const response = await fuelLogCreateEntry(data);
 
-      Alert.alert("Success", "Fuel log entry created successfully!");
+      // Alert.alert("Success", "Fuel log entry created successfully!");
+      Alert.alert("Success", "Fuel log entry created successfully!", [
+        {
+          text: "OK",
+          // onPress: () => console.log("OK Pressed"),
+          onPress: () => router.back(),
+        },
+      ]);
       console.log(response);
     } catch (error) {
       console.error("Submission error:", error);
