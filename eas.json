@@ -1,0 +1,33 @@
+{
+  "cli": {
+    "version": ">= 16.19.3",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "MAPBOX_DOWNLOADS_TOKEN": "@MAPBOX_DOWNLOADS_TOKEN",
+        "MAPBOX_ACCESS_TOKEN": "@MAPBOX_DEV_TOKEN"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "MAPBOX_DOWNLOADS_TOKEN": "@MAPBOX_DOWNLOADS_TOKEN",
+        "MAPBOX_ACCESS_TOKEN": "@MAPBOX_DEV_TOKEN"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "MAPBOX_DOWNLOADS_TOKEN": "@MAPBOX_DOWNLOADS_TOKEN",
+        "MAPBOX_ACCESS_TOKEN": "@MAPBOX_PROD_TOKEN"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

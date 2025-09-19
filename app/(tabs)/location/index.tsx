@@ -146,7 +146,7 @@ const MapLocation = () => {
         setTime(Math.round(duration / 60));
 
         const coords = data.features[0].geometry.coordinates.map(
-          ([lng, lat]) => ({
+          ([lng, lat]: [number, number]) => ({
             latitude: lat,
             longitude: lng,
           })
@@ -434,6 +434,7 @@ const MapLocation = () => {
           />
         </View>
       </ScrollView>
+      <AppButton title="hello" onPress={() => router.push("/location/temp")} />
     </Screen>
   );
 };

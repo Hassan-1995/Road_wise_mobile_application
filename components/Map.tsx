@@ -19,7 +19,8 @@ type DropPoints = {
 
 type MapProps = {
   dropPoints: DropPoints | null;
-  routeCoords: never[];
+  // routeCoords: never[];
+  routeCoords: { latitude: number; longitude: number }[];
   trip: string;
 };
 
