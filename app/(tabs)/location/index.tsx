@@ -16,7 +16,7 @@ import polyline from "@mapbox/polyline";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
 import { router } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -67,7 +67,6 @@ const MapLocation = () => {
   const [routeCoords, setRouteCoords] = useState([]);
   const [polyString, setPolyString] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  // const driverId = 1; //static driver_id
 
   // gets trips + store from back-end
   useFocusEffect(
@@ -93,82 +92,153 @@ const MapLocation = () => {
       fetchDropoutAssignment();
     }, [user?.id])
   );
+  const start = {
+    label: "Live Location",
+    latitude: String(location?.coords.latitude),
+    longitude: String(location?.coords.longitude),
+  };
   // gets store + drop-offs in optimised order
-  useEffect(() => {
-    const fetchOptimisedOrder = async () => {
-      if (!location || !dropPoints) return;
+  // useEffect(() => {
+  //   const fetchOptimisedOrder = async () => {
+  //     if (!location || !dropPoints) return;
 
-      const start = {
-        label: "Live Location",
-        latitude: String(location.coords.latitude),
-        longitude: String(location.coords.longitude),
+  //     const start = {
+  //       label: "Live Location",
+  //       latitude: String(location.coords.latitude),
+  //       longitude: String(location.coords.longitude),
+  //     };
+
+  //     const dropoffs = dropPoints;
+
+  //     try {
+  //       const polylineCoords = await GetOptimisedPolyline(start, dropoffs);
+  //       console.log("POLY-LINE: ", polylineCoords);
+  //       setPoly(polylineCoords as PolyPoints);
+  //     } catch (error) {
+  //       console.error("Error getting polyline:", error);
+  //     }
+  //   };
+
+  //   fetchOptimisedOrder();
+  // }, [dropPoints, location]);
+
+  const fetchRoute = async (poly: PolyPoints | null) => {
+    if (!poly) {
+      return;
+    }
+    try {
+      const coordinates = poly?.map((pt) => [pt.longitude, pt.latitude]);
+      const response = await fetch(
+        "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
+        {
+          method: "POST",
+          headers: {
+            Authorization: ORS_API_KEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ coordinates }),
+        }
+      );
+
+      const data = await response.json();
+
+      const { distance, duration } = data.features[0].properties.summary;
+
+      // setDist(Math.round(distance / 1000));
+      // setTime(Math.round(duration / 60));
+
+      const coords = data.features[0].geometry.coordinates.map(
+        ([lng, lat]: [number, number]) => ({
+          latitude: lat,
+          longitude: lng,
+        })
+      );
+
+      // setRouteCoords(coords);
+      const encoded: string = polyline.encode(
+        coords.map((p: { latitude: number; longitude: number }) => [
+          p.latitude,
+          p.longitude,
+        ])
+      );
+
+      // console.log("Route Cords", routeCoords);
+      // setPolyString(encoded);
+
+      console.log("Route: ", encoded);
+      return {
+        distance: Math.round(distance / 1000),
+        duration: Math.round(duration / 60),
+        coords: coords,
+        encoded: encoded,
       };
+    } catch (error) {
+      console.error("Error fetching route:", error);
+      return {
+        distance: null,
+        duration: null,
+        coords: null,
+        encoded: null,
+      };
+    }
+  };
 
-      const dropoffs = dropPoints;
-
-      try {
-        const polylineCoords = await GetOptimisedPolyline(start, dropoffs);
-        console.log("POLY-LINE: ", polylineCoords);
-        setPoly(polylineCoords as PolyPoints);
-      } catch (error) {
-        console.error("Error getting polyline:", error);
-      }
-    };
-
-    fetchOptimisedOrder();
-  }, [dropPoints, location]);
+  //
+  //important
+  //
   // gets polyline to display on the map
-  useEffect(() => {
-    const fetchRoute = async () => {
-      if (!poly) {
-        return;
-      }
-      try {
-        const coordinates = poly?.map((pt) => [pt.longitude, pt.latitude]);
+  // useEffect(() => {
+  //   const fetchRoute = async () => {
+  //     if (!poly) {
+  //       return;
+  //     }
+  //     try {
+  //       const coordinates = poly?.map((pt) => [pt.longitude, pt.latitude]);
 
-        const response = await fetch(
-          "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
-          {
-            method: "POST",
-            headers: {
-              Authorization: ORS_API_KEY,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ coordinates }),
-          }
-        );
+  //       const response = await fetch(
+  //         "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
+  //         {
+  //           method: "POST",
+  //           headers: {
+  //             Authorization: ORS_API_KEY,
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify({ coordinates }),
+  //         }
+  //       );
 
-        const data = await response.json();
+  //       const data = await response.json();
 
-        const { distance, duration } = data.features[0].properties.summary;
+  //       const { distance, duration } = data.features[0].properties.summary;
 
-        setDist(Math.round(distance / 1000));
-        setTime(Math.round(duration / 60));
+  //       setDist(Math.round(distance / 1000));
+  //       setTime(Math.round(duration / 60));
 
-        const coords = data.features[0].geometry.coordinates.map(
-          ([lng, lat]: [number, number]) => ({
-            latitude: lat,
-            longitude: lng,
-          })
-        );
+  //       const coords = data.features[0].geometry.coordinates.map(
+  //         ([lng, lat]: [number, number]) => ({
+  //           latitude: lat,
+  //           longitude: lng,
+  //         })
+  //       );
 
-        setRouteCoords(coords);
-        const encoded: string = polyline.encode(
-          coords.map((p: { latitude: number; longitude: number }) => [
-            p.latitude,
-            p.longitude,
-          ])
-        );
+  //       setRouteCoords(coords);
+  //       const encoded: string = polyline.encode(
+  //         coords.map((p: { latitude: number; longitude: number }) => [
+  //           p.latitude,
+  //           p.longitude,
+  //         ])
+  //       );
 
-        setPolyString(encoded);
+  //       // console.log("Route Cords", routeCoords);
+  //       setPolyString(encoded);
 
-        console.log("Route: ", encoded);
-      } catch (error) {
-        console.error("Error fetching route:", error);
-      }
-    };
-    fetchRoute();
-  }, [dropPoints, poly]);
+  //       console.log("Route: ", encoded);
+  //     } catch (error) {
+  //       console.error("Error fetching route:", error);
+  //     }
+  //   };
+  //   fetchRoute();
+  // }, [dropPoints, poly]);
 
   // utility function
   const groupByTripId = (
@@ -205,28 +275,16 @@ const MapLocation = () => {
       <ScrollView>
         <View style={{ width: "100%", aspectRatio: 1 }}>
           {/* Map container */}
-          <Map dropPoints={dropPoints} routeCoords={routeCoords} trip={trip} />
+          {/* <Map dropPoints={dropPoints} routeCoords={routeCoords} trip={trip} /> */}
+          <Map
+            dropPoints={dropPoints}
+            routeCoords={[{ latitude: 0, longitude: 0 }]}
+            trip={trip}
+          />
 
           {/* Overlay View */}
-          {polyline && (
-            <View
-              style={{
-                position: "absolute",
-                bottom: 16,
-                right: 16,
-                backgroundColor: "rgba(255, 255, 255, 0.95)", // slightly more opaque
-                paddingVertical: 8,
-                paddingHorizontal: 12,
-                borderRadius: 12,
-                minWidth: 140,
-                alignItems: "flex-start",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.15,
-                shadowRadius: 6,
-                elevation: 6, // Android shadow
-              }}
-            >
+          {/* {polyline && (
+            <View style={styles.overlayBox}>
               <Text style={{ fontWeight: "600", fontSize: 14, color: "#333" }}>
                 Approx. Distance: {dist} km
               </Text>
@@ -241,7 +299,7 @@ const MapLocation = () => {
                 ETA: {time} minutes
               </Text>
             </View>
-          )}
+          )} */}
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -295,7 +353,6 @@ const MapLocation = () => {
                     <Pressable
                       key={item.id}
                       onPress={() => {
-                        // Do something on press, e.g., navigate or show details
                         console.log("Pressed store:", item.storename);
                         // router.push("/location/updateStore")
                         router.push({
@@ -366,7 +423,45 @@ const MapLocation = () => {
 
               if (!dropPoints || !routeCoords) return;
 
-              setTripData(trip, dropPoints, routeCoords, dist || 0, time || 0);
+              const dropoffs = dropPoints;
+
+              try {
+                const polylineCoords = (await GetOptimisedPolyline(
+                  start,
+                  dropoffs
+                )) as PolyPoints;
+                console.log("POLY-LINE: ", polylineCoords);
+                const route = await fetchRoute(polylineCoords);
+
+                if (!route) return;
+                // const { distance, duration, coords, encoded } = route;
+
+                const { distance, duration, coords, encoded } = route;
+
+                setPoly(polylineCoords as PolyPoints);
+                setRouteCoords(coords);
+                setDist(distance);
+                setTime(duration);
+                setPolyString(encoded);
+
+                setTripData(
+                  trip,
+                  dropPoints,
+                  coords,
+                  distance || 0,
+                  duration || 0
+                );
+              } catch (error) {
+                console.error("Error getting polyline:", error);
+              }
+
+              // setTripData(
+              //   trip,
+              //   dropPoints,
+              //   routeCoords || 0,
+              //   dist || 0,
+              //   time || 0
+              // );
 
               const driverId = (await getDriverID(user?.id || 0)) as {
                 id: number;
@@ -434,7 +529,6 @@ const MapLocation = () => {
           />
         </View>
       </ScrollView>
-      <AppButton title="hello" onPress={() => router.push("/location/temp")} />
     </Screen>
   );
 };
@@ -449,6 +543,22 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  overlayBox: {
+    position: "absolute",
+    bottom: 16,
+    right: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.95)", // slightly more opaque
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    minWidth: 140,
+    alignItems: "flex-start",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 6, // Android shadow
   },
   overlay: {
     position: "absolute",

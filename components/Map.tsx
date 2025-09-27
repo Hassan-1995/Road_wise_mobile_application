@@ -1,6 +1,7 @@
 import { COLORS } from "@/constants/theme";
 import useCurrentLocation from "@/hooks/useCurrentLocation";
-import React from "react";
+import { default as Mapbox, default as MapboxGL } from "@rnmapbox/maps";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -9,7 +10,6 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
 
 type DropPoints = {
   latitude: string;
@@ -19,13 +19,56 @@ type DropPoints = {
 
 type MapProps = {
   dropPoints: DropPoints | null;
-  // routeCoords: never[];
   routeCoords: { latitude: number; longitude: number }[];
   trip: string;
 };
+type Bounds = {
+  ne: [number, number]; // [lng, lat]
+  sw: [number, number];
+};
+
+// MapboxGL.setAccessToken("YOUR_MAPBOX_ACCESS_TOKEN");
+MapboxGL.setAccessToken(
+  "pk.eyJ1IjoibWhhbW1hZGFobWVkIiwiYSI6ImNtZnAyMTdkNjA1OWYybHNjbnp1YWgzMnAifQ.kN2hvJpdtQyfuczOU5X-BQ"
+);
 
 const Map = ({ dropPoints, routeCoords, trip }: MapProps) => {
   const { location, region } = useCurrentLocation();
+
+  const [bounds, setBounds] = useState<Bounds | null>(null);
+
+  useEffect(() => {
+    if ((!dropPoints || dropPoints.length === 0) && location) {
+      setBounds(null);
+      return;
+    }
+
+    // Start with user's location as bounds
+    let minLat =
+      location?.coords.latitude ?? Number(dropPoints?.[0].latitude ?? 0);
+    let maxLat = minLat;
+    let minLng =
+      location?.coords.longitude ?? Number(dropPoints?.[0].longitude ?? 0);
+    let maxLng = minLng;
+
+    // Expand bounds with dropPoints
+    dropPoints?.forEach((p) => {
+      const lat = Number(p.latitude);
+      const lng = Number(p.longitude);
+
+      if (lat < minLat) minLat = lat;
+      if (lat > maxLat) maxLat = lat;
+      if (lng < minLng) minLng = lng;
+      if (lng > maxLng) maxLng = lng;
+    });
+
+    setBounds({
+      ne: [maxLng, maxLat],
+      sw: [minLng, minLat],
+    });
+  }, [dropPoints, location]);
+
+  console.log("Region:", bounds);
 
   if (!location || !region) {
     return (
@@ -41,45 +84,86 @@ const Map = ({ dropPoints, routeCoords, trip }: MapProps) => {
 
   return (
     <View style={styles.container}>
-      <MapView
+      <Mapbox.MapView
         style={styles.map}
-        region={{
-          ...region,
-          latitudeDelta: 0.25,
-          longitudeDelta: 0.25,
-        }}
-        showsUserLocation={true}
+        styleURL={MapboxGL.StyleURL.Street} // You can switch to Satellite etc.
       >
-        <Marker
-          coordinate={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          }}
-          title="You are here"
-          pinColor={COLORS.primary}
+        {/* Camera (controls what part of the map to show) */}
+
+        <Mapbox.Camera
+          centerCoordinate={[region.longitude, region.latitude]}
+          zoomLevel={10}
         />
 
-        {dropPoints?.map((points) => (
-          <Marker
-            key={points.label}
-            coordinate={{
-              latitude: Number(points.latitude),
-              longitude: Number(points.longitude),
+        {bounds ? (
+          <Mapbox.Camera
+            bounds={{
+              ne: bounds.ne,
+              sw: bounds.sw,
+              paddingTop: 50,
+              paddingBottom: 50,
+              paddingLeft: 50,
+              paddingRight: 50,
             }}
-            title={points.label}
-            pinColor={COLORS.red}
+            // zoomLevel={5}
+            animationDuration={1000}
           />
-        ))}
-
-        {routeCoords.length > 0 && (
-          <Polyline
-            coordinates={routeCoords}
-            strokeColor={COLORS.secondary}
-            strokeWidth={4}
+        ) : (
+          <Mapbox.Camera
+            centerCoordinate={[region.longitude, region.latitude]}
+            zoomLevel={10}
           />
         )}
-      </MapView>
 
+        {/* User Location */}
+        <Mapbox.UserLocation visible={true} showsUserHeadingIndicator={true} />
+
+        {/* Drop Points Markers */}
+        {dropPoints?.map((point) => (
+          <Mapbox.PointAnnotation
+            key={point.label}
+            id={point.label}
+            coordinate={[Number(point.longitude), Number(point.latitude)]}
+          >
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: 10,
+                backgroundColor: COLORS.red,
+                borderWidth: 2,
+                borderColor: "white",
+              }}
+            />
+            <Mapbox.Callout title={point.label} />
+          </Mapbox.PointAnnotation>
+        ))}
+
+        {/* Route Polyline */}
+        {routeCoords.length > 0 && (
+          <Mapbox.ShapeSource
+            id="routeSource"
+            shape={{
+              type: "Feature",
+              geometry: {
+                type: "LineString",
+                coordinates: routeCoords.map((c) => [c.longitude, c.latitude]),
+              },
+              properties: {},
+            }}
+          >
+            <Mapbox.LineLayer
+              id="routeLine"
+              style={{
+                lineColor: COLORS.secondary,
+                lineWidth: 4,
+              }}
+            />
+          </Mapbox.ShapeSource>
+        )}
+      </Mapbox.MapView>
+
+      {/* Overlay trip info */}
       <View style={styles.overlay}>
         <View style={styles.tripContainer}>
           <Text style={styles.tripText}>TRP-{trip.padStart(3, "0")}</Text>

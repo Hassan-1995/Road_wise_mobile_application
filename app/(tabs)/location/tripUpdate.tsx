@@ -1,6 +1,223 @@
-import { updateTripStatusOrEndTime } from "@/api/optimisedPath_statusOrEndtime"; // your backend API
+// import { updateTripStatusOrEndTime } from "@/api/optimisedPath_statusOrEndtime"; // your backend API
+// import { getTripDetail, Trip } from "@/api/tripByID";
+// import { setTripTime } from "@/api/tripTime";
+// import AppButton from "@/components/AppButton";
+// import { stopBackgroundLocationTracking } from "@/components/LocationTask";
+// import Screen from "@/components/Screen";
+// import { COLORS } from "@/constants/theme";
+// import { useTripStore } from "@/stores/useTripStore";
+// import { Picker } from "@react-native-picker/picker";
+// import React, { useEffect, useState } from "react";
+// import { Alert, StyleSheet, Switch, Text, View } from "react-native";
+
+// const TripUpdateScreen = () => {
+//   const { trip } = useTripStore();
+
+//   const [status, setStatus] = useState<
+//     "Ongoing" | "Pending" | "Completed" | "Cancelled" | undefined
+//   >(undefined);
+//   const [endTrip, setEndTrip] = useState(false);
+
+//   const handleConfirm = async () => {
+//     try {
+//       const payload = {
+//         tripId: Number(trip),
+//         status,
+//         updateEndTime: endTrip,
+//       };
+
+//       const result = await updateTripStatusOrEndTime(payload);
+//       console.log("Update response:", result);
+
+//       Alert.alert(
+//         "Success",
+//         `Trip ${endTrip ? "ended" : "updated"} with status: ${status}`
+//       );
+//     } catch (error) {
+//       console.error("Error updating trip:", error);
+//       Alert.alert("Error", "Failed to update trip. Please try again.");
+//     }
+//   };
+
+//   const checkEndTrip = async () => {
+//     try {
+//       const res = await setTripTime({
+//         tripId: Number(trip),
+//         endTime: new Date().toISOString(),
+//       });
+//       alert("Trip time ended successfully");
+//       setEndTrip(true);
+//     } catch (error) {
+//       console.error("Failed to stop trip end time:", error);
+//       alert("Failed to stop trip end time:" + error);
+//     }
+//     //   try {
+//     //               const res = (await setTripTime({
+//     //                 tripId: Number(trip),
+//     //                 endTime: new Date().toISOString(),
+//     //               })) as {
+//     //                 alreadyExists: boolean;
+//     //                 endTime: string;
+//     //                 message: string;
+//     //                 success: boolean;
+//     //               };
+//     //               console.log(res);
+//     //               if (res.alreadyExists) {
+//     //                 alert("Trip end time was already set at: " + res.endTime);
+//     //                 setEndTrip(true); // force switch ON
+//     //               } else {
+//     //                 alert("Trip time ended successfully");
+//     //                 setEndTrip(true); // set ON after success
+//     //               }
+//     //             } catch (error) {
+//     //               console.error("Failed to stop trip end time:", error);
+//     //               alert("Failed to stop trip end time:" + error);
+//     //             }
+//     //           }
+//   };
+
+//   useEffect(() => {
+//     const fetchEndTripStatus = async () => {
+//       try {
+//         const response = (await getTripDetail({
+//           tripID: Number(trip),
+//         })) as Trip;
+//         console.log("NEW: ", response);
+//         if (response.endTime === null) {
+//           setEndTrip(false);
+//         } else {
+//           setEndTrip(true);
+//         }
+//       } catch (error) {
+//         console.error("Failed to stop trip end time:", error);
+//       }
+//     };
+//     fetchEndTripStatus();
+//   }, [trip]);
+
+//   return (
+//     <Screen>
+//       <View style={styles.container}>
+//         <Text style={styles.title}>Update Trip</Text>
+
+//         {/* Status Picker */}
+//         <Text style={styles.label}>Status</Text>
+//         <View style={styles.pickerWrapper}>
+//           <Picker
+//             selectedValue={status}
+//             onValueChange={(value) => setStatus(value)}
+//             style={styles.picker}
+//           >
+//             <Picker.Item label="Pick a value" value={undefined} />
+//             <Picker.Item label="Pending" value="Pending" />
+//             <Picker.Item label="Ongoing" value="Ongoing" />
+//             <Picker.Item label="Completed" value="Completed" />
+//             <Picker.Item label="Cancelled" value="Cancelled" />
+//           </Picker>
+//         </View>
+
+//         {/* End Trip Toggle */}
+//         <View style={styles.switchRow}>
+//           <Text style={styles.switchLabel}>End Trip</Text>
+//           {/* <Switch
+//             value={endTrip}
+//             onValueChange={async () => {
+//               // Prevent toggling back to false
+//               if (endTrip) return;
+
+//               stopBackgroundLocationTracking();
+
+//               try {
+//                 const res = (await setTripTime({
+//                   tripId: Number(trip),
+//                   endTime: new Date().toISOString(),
+//                 })) as {
+//                   alreadyExists: boolean;
+//                   endTime: string;
+//                   message: string;
+//                   success: boolean;
+//                 };
+
+//                 console.log(res);
+
+//                 if (res.alreadyExists) {
+//                   alert("Trip end time was already set at: " + res.endTime);
+//                   setEndTrip(true); // force switch ON
+//                 } else {
+//                   alert("Trip time ended successfully");
+//                   setEndTrip(true); // set ON after success
+//                 }
+//               } catch (error) {
+//                 console.error("Failed to stop trip end time:", error);
+//                 alert("Failed to stop trip end time:" + error);
+//               }
+//             }}
+//             trackColor={{ false: COLORS.green, true: COLORS.red }}
+//             thumbColor={endTrip ? COLORS.primary : COLORS.primary}
+//           /> */}
+
+//           <Switch
+//             value={endTrip}
+//             onValueChange={async () => {
+//               if (endTrip) return; // ✅ lock once true
+//               stopBackgroundLocationTracking();
+//               await checkEndTrip();
+//             }}
+//             trackColor={{ false: COLORS.green, true: COLORS.red }}
+//             thumbColor={endTrip ? COLORS.primary : COLORS.primary}
+//           />
+//         </View>
+
+//         {/* Confirm Button */}
+//         <AppButton title="Confirm" onPress={handleConfirm} />
+//       </View>
+//     </Screen>
+//   );
+// };
+
+// export default TripUpdateScreen;
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 16,
+//     backgroundColor: "#F5F7FA",
+//   },
+//   title: {
+//     fontSize: 22,
+//     fontWeight: "bold",
+//     marginBottom: 20,
+//   },
+//   label: {
+//     fontSize: 14,
+//     fontWeight: "600",
+//     color: "#666",
+//     marginBottom: 8,
+//   },
+//   pickerWrapper: {
+//     borderWidth: 1,
+//     borderColor: "#ccc",
+//     borderRadius: 8,
+//     marginBottom: 24,
+//   },
+//   picker: {
+//     width: "100%",
+//   },
+//   switchRow: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//     justifyContent: "space-between",
+//     marginBottom: 24,
+//   },
+//   switchLabel: {
+//     fontSize: 16,
+//     fontWeight: "500",
+//     color: "#111",
+//   },
+// });
+
+import { updateTripStatusOrEndTime } from "@/api/optimisedPath_statusOrEndtime";
 import { getTripDetail, Trip } from "@/api/tripByID";
-import { setTripTime } from "@/api/tripTime";
 import AppButton from "@/components/AppButton";
 import { stopBackgroundLocationTracking } from "@/components/LocationTask";
 import Screen from "@/components/Screen";
@@ -18,78 +235,54 @@ const TripUpdateScreen = () => {
   >(undefined);
   const [endTrip, setEndTrip] = useState(false);
 
+  // ✅ One function to handle both status + end time
   const handleConfirm = async () => {
     try {
       const payload = {
         tripId: Number(trip),
         status,
-        updateEndTime: endTrip,
+        updateEndTime: endTrip, // if true, backend should set endTime
+        endTime: endTrip ? new Date().toISOString() : null, // optional if backend supports
       };
+
+      console.log("Sending payload:", payload);
 
       const result = await updateTripStatusOrEndTime(payload);
       console.log("Update response:", result);
+
+      if (endTrip) stopBackgroundLocationTracking();
 
       Alert.alert(
         "Success",
         `Trip ${endTrip ? "ended" : "updated"} with status: ${status}`
       );
+
+      // lock the switch if ended
+      if (endTrip) setEndTrip(true);
     } catch (error) {
       console.error("Error updating trip:", error);
       Alert.alert("Error", "Failed to update trip. Please try again.");
     }
   };
 
-  const checkEndTrip = async () => {
-    try {
-      const res = await setTripTime({
-        tripId: Number(trip),
-        endTime: new Date().toISOString(),
-      });
-      alert("Trip time ended successfully");
-      setEndTrip(true);
-    } catch (error) {
-      console.error("Failed to stop trip end time:", error);
-      alert("Failed to stop trip end time:" + error);
-    }
-    //   try {
-    //               const res = (await setTripTime({
-    //                 tripId: Number(trip),
-    //                 endTime: new Date().toISOString(),
-    //               })) as {
-    //                 alreadyExists: boolean;
-    //                 endTime: string;
-    //                 message: string;
-    //                 success: boolean;
-    //               };
-    //               console.log(res);
-    //               if (res.alreadyExists) {
-    //                 alert("Trip end time was already set at: " + res.endTime);
-    //                 setEndTrip(true); // force switch ON
-    //               } else {
-    //                 alert("Trip time ended successfully");
-    //                 setEndTrip(true); // set ON after success
-    //               }
-    //             } catch (error) {
-    //               console.error("Failed to stop trip end time:", error);
-    //               alert("Failed to stop trip end time:" + error);
-    //             }
-    //           }
-  };
-
+  // ✅ On screen load, fetch whether trip is already ended
   useEffect(() => {
     const fetchEndTripStatus = async () => {
       try {
         const response = (await getTripDetail({
           tripID: Number(trip),
         })) as Trip;
-        console.log("NEW: ", response);
-        if (response.endTime === null) {
-          setEndTrip(false);
-        } else {
+
+        console.log("Trip details:", response);
+
+        if (response.endTime) {
           setEndTrip(true);
+        } else {
+          setEndTrip(false);
         }
+        setStatus(response.status as any); // preload current status
       } catch (error) {
-        console.error("Failed to stop trip end time:", error);
+        console.error("Failed to fetch trip detail:", error);
       }
     };
     fetchEndTripStatus();
@@ -105,10 +298,12 @@ const TripUpdateScreen = () => {
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={status}
-            onValueChange={(value) => setStatus(value)}
+            onValueChange={(value) =>
+              setStatus(value === undefined ? undefined : value)
+            }
             style={styles.picker}
           >
-            <Picker.Item label="Pick a value" value="undefined" />
+            <Picker.Item label="Pick a value" value={undefined} />
             <Picker.Item label="Pending" value="Pending" />
             <Picker.Item label="Ongoing" value="Ongoing" />
             <Picker.Item label="Completed" value="Completed" />
@@ -119,52 +314,14 @@ const TripUpdateScreen = () => {
         {/* End Trip Toggle */}
         <View style={styles.switchRow}>
           <Text style={styles.switchLabel}>End Trip</Text>
-          {/* <Switch
-            value={endTrip}
-            onValueChange={async () => {
-              // Prevent toggling back to false
-              if (endTrip) return;
-
-              stopBackgroundLocationTracking();
-
-              try {
-                const res = (await setTripTime({
-                  tripId: Number(trip),
-                  endTime: new Date().toISOString(),
-                })) as {
-                  alreadyExists: boolean;
-                  endTime: string;
-                  message: string;
-                  success: boolean;
-                };
-
-                console.log(res);
-
-                if (res.alreadyExists) {
-                  alert("Trip end time was already set at: " + res.endTime);
-                  setEndTrip(true); // force switch ON
-                } else {
-                  alert("Trip time ended successfully");
-                  setEndTrip(true); // set ON after success
-                }
-              } catch (error) {
-                console.error("Failed to stop trip end time:", error);
-                alert("Failed to stop trip end time:" + error);
-              }
-            }}
-            trackColor={{ false: COLORS.green, true: COLORS.red }}
-            thumbColor={endTrip ? COLORS.primary : COLORS.primary}
-          /> */}
-
           <Switch
             value={endTrip}
-            onValueChange={async () => {
-              if (endTrip) return; // ✅ lock once true
-              stopBackgroundLocationTracking();
-              await checkEndTrip();
+            onValueChange={() => {
+              if (endTrip) return; // lock once ended
+              setEndTrip(true); // only set, actual save happens in Confirm
             }}
             trackColor={{ false: COLORS.green, true: COLORS.red }}
-            thumbColor={endTrip ? COLORS.primary : COLORS.primary}
+            thumbColor={COLORS.primary}
           />
         </View>
 

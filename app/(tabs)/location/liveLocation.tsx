@@ -13,6 +13,8 @@ const LiveLocation = () => {
 
   const [currentTime, setCurrentTime] = useState("");
 
+
+  
   useEffect(() => {
     const update = () => {
       const now = new Date();
@@ -45,6 +47,7 @@ const LiveLocation = () => {
       <View style={{ width: "100%", height: "95%" }}>
         {/* Map container with overlay inside */}
         <View style={{ flex: 1 }}>
+          {/* <Map dropPoints={dropPoints} routeCoords={routeCoords} trip={trip} /> */}
           <Map dropPoints={dropPoints} routeCoords={routeCoords} trip={trip} />
 
           {/* Overlay on top of the Map */}
